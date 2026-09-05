@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Набор из 3 ароматов</title>
+<style>
+:root{
+  --paper:#E7E9E4; --surface:#FBFBF9; --ink:#15181A; --muted:#6B7069;
+  --line:#D3D7CF; --oil:#9A6318; --bottle:#2C4438; --off:#B8382E;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--paper);color:var(--ink);padding-bottom:104px;
+ font:400 16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+header{padding:24px 0 6px}
+h1{font:400 30px/1.08 Georgia,"Times New Roman",serif;margin:0 0 6px;cursor:default;user-select:none}
+.sub{color:var(--muted);font-size:14px}
+.count{color:var(--muted);font-size:13px;padding:20px 2px 7px}
+.row{display:flex;align-items:center;gap:12px;background:var(--surface);
+ border:1px solid var(--line);border-top:0;padding:12px 13px;cursor:pointer}
+.row:first-of-type{border-top:1px solid var(--line)}
+.box{flex:0 0 auto;width:21px;height:21px;border:1px solid var(--line);border-radius:2px;background:#fff;position:relative}
+.row.sel{background:#fff;box-shadow:inset 3px 0 0 var(--oil)}
+.row.sel .box{background:var(--oil);border-color:var(--oil)}
+.row.sel .box::after{content:"";position:absolute;left:6.5px;top:2.5px;width:5px;height:10px;
+ border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.row.lock{opacity:.4;cursor:default}
+.info{flex:1 1 auto;min-width:0}
+.brand{font-size:12px;color:var(--muted)}
+.name{font:400 17px/1.25 Georgia,"Times New Roman",serif;margin-top:1px}
+.notes{font-size:12.5px;color:var(--muted);margin-top:3px}
+.g{flex:0 0 auto;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:100px;padding:2px 8px}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--bottle);color:#fff;
+ padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.bar .inner{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.dotsn{display:flex;gap:5px}
+.dotsn i{width:9px;height:9px;border-radius:50%;border:1px solid rgba(255,255,255,.55)}
+.dotsn i.f{background:#fff;border-color:#fff}
+.n{flex:1 1 auto;font-size:13px;color:rgba(255,255,255,.75)}
+.bar button{border:0;border-radius:2px;background:#fff;color:var(--bottle);
+ font-size:15px;font-weight:600;padding:12px 20px;cursor:pointer}
+.bar button[disabled]{background:rgba(255,255,255,.18);color:rgba(255,255,255,.5);cursor:default}
+.ghost{background:transparent!important;color:rgba(255,255,255,.6)!important;padding:12px 2px!important;font-weight:400!important}
+
+.sheet{position:fixed;inset:0;z-index:40;background:var(--paper);overflow-y:auto;
+ transform:translateX(100%);transition:transform .25s ease}
+.sheet.on{transform:none}
+.back{border:0;background:none;color:var(--ink);font-size:15px;padding:18px 0 6px;cursor:pointer}
+.slip{background:var(--surface);border:1px solid var(--line);padding:20px 18px;margin:6px 0 18px}
+.slip h2{font:400 24px/1.1 Georgia,serif;margin:0 0 14px}
+.vlabel{font-size:12.5px;color:var(--muted);margin-bottom:7px}
+.vol{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:20px}
+.vol button{border:1px solid var(--line);background:transparent;color:var(--muted);
+ padding:10px 0;font-size:14px;border-radius:2px;cursor:pointer}
+.vol button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.item{display:flex;align-items:baseline;gap:8px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.item .t{font:400 16px/1.25 Georgia,serif}
+.item .t i{display:block;font:400 12px/1.3 -apple-system,sans-serif;font-style:normal;color:var(--muted)}
+.lead{flex:1 1 auto;border-bottom:1px dotted var(--line);transform:translateY(-3px)}
+.item .p{font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sumline{display:flex;justify-content:space-between;align-items:baseline;padding:18px 0 0}
+.sumline span{font-size:15px}
+.big{font:400 34px/1 Georgia,serif;font-variant-numeric:tabular-nums}
+.acts{display:flex;flex-direction:column;gap:8px;margin-bottom:40px}
+.acts button,.acts a{display:block;text-align:center;text-decoration:none;border:1px solid var(--ink);
+ background:var(--ink);color:#fff;border-radius:2px;padding:14px;font-size:15px;font-weight:600;cursor:pointer}
+.acts .alt{background:transparent;color:var(--ink)}
+.acts .lite{background:transparent;border-color:var(--line);color:var(--muted);font-weight:400}
+
+/* ---------- режим владельца ---------- */
+.admin{background:#1B211D}
+.admin .wrap{color:#E7E9E4}
+.admin .back{color:#E7E9E4}
+.ahead{padding:4px 0 16px;border-bottom:1px solid #33403A;margin-bottom:18px}
+.ahead h2{font:400 24px/1.1 Georgia,serif;margin:0 0 4px;color:#fff}
+.ahead p{margin:0;font-size:13px;color:#8B968F}
+.card{background:#222A25;border:1px solid #33403A;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font:400 15px/1.2 -apple-system,sans-serif;font-weight:600;color:#fff}
+.f{display:flex;gap:8px;margin-bottom:8px}
+.admin input,.admin select{width:100%;background:#1B211D;border:1px solid #3D4A43;color:#E7E9E4;
+ padding:11px 12px;font-size:15px;border-radius:2px;outline:none}
+.admin input:focus,.admin select:focus{border-color:var(--oil)}
+.admin label{display:block;font-size:12px;color:#8B968F;margin:0 0 4px}
+.addbtn{width:100%;border:0;background:var(--oil);color:#fff;padding:13px;font-size:15px;
+ font-weight:600;border-radius:2px;cursor:pointer;margin-top:4px}
+.arow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #2C3630}
+.arow .t{flex:1 1 auto;min-width:0}
+.arow .t b{display:block;font:400 16px/1.2 Georgia,serif;font-weight:400;color:#fff}
+.arow .t span{font-size:12px;color:#8B968F}
+.arow.hid .t b{color:#6E7B74;text-decoration:line-through}
+.sw{border:1px solid #3D4A43;background:transparent;color:#8B968F;font-size:12px;
+ padding:7px 11px;border-radius:100px;cursor:pointer;white-space:nowrap}
+.sw.on{background:#2F4A3C;border-color:#3E6350;color:#DDEBD8}
+.del{border:0;background:none;color:#7A5450;font-size:18px;padding:4px 2px;cursor:pointer}
+.aacts{display:flex;flex-direction:column;gap:8px;margin:18px 0 40px}
+.aacts button{border:0;border-radius:2px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;
+ background:#fff;color:#1B211D}
+.aacts .alt{background:transparent;border:1px solid #3D4A43;color:#E7E9E4;font-weight:400}
+.hint{font-size:12.5px;color:#8B968F;line-height:1.5;margin:0 0 6px}
+
+.modal{position:fixed;inset:0;z-index:70;background:rgba(21,24,26,.55);display:none;
+ align-items:center;justify-content:center;padding:20px}
+.modal.on{display:flex}
+.modal .in{background:var(--surface);border:1px solid var(--line);padding:20px;width:100%;max-width:300px}
+.modal h3{margin:0 0 12px;font:400 19px/1.2 Georgia,serif}
+.modal input{width:100%;padding:12px;font-size:18px;border:1px solid var(--line);border-radius:2px;
+ text-align:center;letter-spacing:.3em;outline:none}
+.modal .mb{display:flex;gap:8px;margin-top:12px}
+.modal .mb button{flex:1;border:1px solid var(--ink);background:var(--ink);color:#fff;padding:12px;
+ border-radius:2px;font-size:15px;cursor:pointer}
+.modal .mb .c{background:transparent;color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--ink);color:#fff;
+ padding:11px 18px;border-radius:2px;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:80}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1 id="title">Соберите набор из 3 ароматов</h1>
+    <div class="sub">Выберите три аромата, затем объём — цена посчитается сама.</div>
+  </header>
+  <div class="count" id="cnt"></div>
+  <div id="list"></div>
+</div>
+
+<div class="bar">
+  <div class="inner">
+    <div class="dotsn" id="dots"></div>
+    <div class="n" id="n">Выбрано 0 из 3</div>
+    <button class="ghost" id="reset">Сбросить</button>
+    <button id="go" disabled>Далее</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="wrap">
+    <button class="back" id="back">← Изменить выбор</button>
+    <div class="slip">
+      <h2>Ваш набор</h2>
+      <div class="vlabel">Объём каждого флакона</div>
+      <div class="vol" id="vol"></div>
+      <div id="picked"></div>
+      <div class="sumline"><span>Итого за набор</span><b class="big" id="sum"></b></div>
+    </div>
+    <div class="acts">
+      <a id="wa" href="#" target="_blank" rel="noopener">Отправить заказ в WhatsApp</a>
+      <button class="alt" id="copy">Скопировать заказ</button>
+      <button class="lite" id="clear2">Собрать заново</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet admin" id="admin">
+  <div class="wrap">
+    <button class="back" id="aback">← Выйти из редактирования</button>
+    <div class="ahead">
+      <h2>Режим владельца</h2>
+      <p>Клиент этот экран не видит. Изменения нужно сохранить в новый файл.</p>
+    </div>
+
+    <div class="card">
+      <h3>Добавить аромат</h3>
+      <div class="f">
+        <div style="flex:1"><label>Бренд</label><input id="fb" placeholder="Tom Ford"></div>
+        <div style="flex:0 0 116px"><label>Пол</label>
+          <select id="fg"><option>Унисекс</option><option>Мужской</option><option>Женский</option></select></div>
+      </div>
+      <label>Название</label><input id="fn" placeholder="Lost Cherry">
+      <div style="height:8px"></div>
+      <label>Ноты — коротко</label><input id="ft" placeholder="вишня, миндаль, ликёр">
+      <button class="addbtn" id="add">Добавить в список</button>
+    </div>
+
+    <div class="card">
+      <h3>Цена</h3>
+      <label>Стоимость набора 3 × 6 мл, ₸</label>
+      <input id="fp" type="number" inputmode="numeric">
+      <p class="hint" style="margin-top:8px" id="perml"></p>
+    </div>
+
+    <div class="card">
+      <h3>Объёмы <span style="color:#8B968F;font-weight:400" id="vcnt"></span></h3>
+      <p class="hint">Клиент выбирает только показанные объёмы. Нет флакона — скройте, появится — включите обратно.</p>
+      <div id="vlist"></div>
+      <div style="height:12px"></div>
+      <label>Добавить объём, мл</label>
+      <div class="f">
+        <input id="fv" type="number" inputmode="numeric" placeholder="75">
+        <button class="addbtn" id="addv" style="margin-top:0;flex:0 0 120px">Добавить</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Контакт и доступ</h3>
+      <label>WhatsApp для заказов — только цифры</label>
+      <input id="fw" inputmode="numeric" placeholder="77071697002">
+      <div style="height:8px"></div>
+      <label>Код входа в этот режим</label>
+      <input id="fc" inputmode="numeric" maxlength="6">
+      <p class="hint" style="margin-top:8px">Новый код заработает в файле, который вы сохраните ниже. Запишите его.</p>
+    </div>
+
+    <div class="card">
+      <h3>Список <span style="color:#8B968F;font-weight:400" id="acnt"></span></h3>
+      <p class="hint">«Показан» — аромат видит клиент. «Скрыт» — исчезает из подбора совсем.</p>
+      <div id="alist"></div>
+    </div>
+
+    <div class="aacts">
+      <button id="save">Сохранить файл для клиентов</button>
+      <button class="alt" id="dump">Скопировать список текстом</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="in">
+    <h3>Код доступа</h3>
+    <input id="pin" type="password" inputmode="numeric" maxlength="6" placeholder="••••">
+    <div class="mb"><button class="c" id="pcancel">Отмена</button><button id="pok">Войти</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let DATA = [{"id":1,"brand":"Amouage","name":"Guidance","gender":"Унисекс","notes":"ваниль, ирис, шафран — плотный сладко-пряный","ok":true},{"id":2,"brand":"Bvlgari","name":"Tyger","gender":"Унисекс","notes":"","ok":false},{"id":3,"brand":"By Kilian","name":"Good Girl Gone Bad","gender":"Женский","notes":"тубероза, слива, жасмин — тёмный цветочный","ok":true},{"id":4,"brand":"Byredo","name":"Bal d'Afrique","gender":"Унисекс","notes":"фиалка, нероли, ветивер — тёплый цитрус","ok":true},{"id":5,"brand":"Byredo","name":"Blanche","gender":"Унисекс","notes":"белый мускус, альдегиды — «чистое бельё»","ok":true},{"id":7,"brand":"Clive Christian","name":"Blonde Amber","gender":"Унисекс","notes":"тёплая амбра, ваниль, специи","ok":true},{"id":8,"brand":"Clive Christian","name":"Matsukita","gender":"Унисекс","notes":"дымный, пряный, с чайными нотами","ok":true},{"id":9,"brand":"Creed","name":"Aventus","gender":"Мужской","notes":"ананас, берёзовый дым, мускус — статусный","ok":true},{"id":10,"brand":"Creed","name":"Silver Mountain Water","gender":"Унисекс","notes":"чёрная смородина, чай, мускус — свежий","ok":true},{"id":6,"brand":"Dior","name":"J'adore","gender":"Женский","notes":"иланг-иланг, роза, жасмин — женская классика","ok":true},{"id":12,"brand":"Ex Nihilo","name":"Blue Talisman","gender":"Унисекс","notes":"цитрус, морская свежесть, амбра","ok":true},{"id":11,"brand":"Giorgio Armani","name":"Emporio Armani Stronger With You","gender":"Мужской","notes":"кардамон, каштан, ваниль — сладкий тёплый","ok":true},{"id":13,"brand":"Louis Vuitton","name":"Afternoon Swim","gender":"Унисекс","notes":"апельсин, мандарин — солнечный цитрус","ok":true},{"id":14,"brand":"Louis Vuitton","name":"Imagination","gender":"Мужской","notes":"чай, цитрус, амбра — лёгкий нишевый","ok":true},{"id":15,"brand":"Louis Vuitton","name":"Pacific Chill","gender":"Унисекс","notes":"","ok":false},{"id":16,"brand":"Maison Crivelli","name":"Maracuja","gender":"Унисекс","notes":"","ok":false},{"id":17,"brand":"Marc-Antoine Barrois","name":"Ganymede","gender":"Унисекс","notes":"мандарин, замша, минеральный — «космос»","ok":true},{"id":18,"brand":"Nishane","name":"Hacivat","gender":"Унисекс","notes":"ананас, пачули, дерево — плотный фруктово-древесный","ok":true},{"id":19,"brand":"Parfums de Marly","name":"Layton","gender":"Мужской","notes":"яблоко, лаванда, ваниль — сладко-пряный","ok":true},{"id":20,"brand":"Roja Dove","name":"Elysium","gender":"Мужской","notes":"грейпфрут, лимон, кедр — свежий дорогой","ok":true},{"id":21,"brand":"Tom Ford","name":"Lost Cherry","gender":"Унисекс","notes":"вишня, миндаль, ликёр — сладкий гурман","ok":true}];
+let BASE = 12000;              // цена набора 3 × 6 мл
+let PIN_CODE = "2902";         // код входа в режим владельца
+let PHONE = "77071697002";          // WhatsApp для заказов
+let VOLS = [{"v":6,"ok":true},{"v":10,"ok":true},{"v":15,"ok":false},{"v":20,"ok":false},{"v":25,"ok":false},{"v":30,"ok":false},{"v":50,"ok":false},{"v":100,"ok":false}];
+const MAX = 3, BASE_ML = 6;
+
+const $ = id => document.getElementById(id);
+const perMl = () => BASE / (MAX * BASE_ML);
+const money = n => Math.round(n).toLocaleString('ru-RU').replace(/\u00A0/g,' ') + ' ₸';
+
+let vol = 0, picked = [];
+
+/* ---------- клиентский экран ---------- */
+function shown(){ return DATA.filter(p => p.ok); }
+
+function render(){
+  const arr = shown();
+  $('cnt').textContent = arr.length + ' ароматов в наличии';
+  $('list').innerHTML = arr.map(p=>{
+    const sel = picked.includes(p.id), lock = !sel && picked.length >= MAX;
+    return '<div class="row'+(sel?' sel':'')+(lock?' lock':'')+'" data-id="'+p.id+'">'+
+      '<div class="box"></div><div class="info"><div class="brand">'+esc(p.brand)+'</div>'+
+      '<div class="name">'+esc(p.name)+'</div>'+
+      (p.notes?'<div class="notes">'+esc(p.notes)+'</div>':'')+'</div>'+
+      '<div class="g">'+esc(p.gender)+'</div></div>';
+  }).join('');
+  $('dots').innerHTML = [0,1,2].map(i=>'<i class="'+(i<picked.length?'f':'')+'"></i>').join('');
+  $('n').textContent = picked.length===MAX ? 'Набор собран' : 'Выбрано '+picked.length+' из 3';
+  $('go').disabled = picked.length !== MAX || vshown().length === 0;
+}
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+$('list').addEventListener('click', e=>{
+  const row = e.target.closest('.row'); if(!row || row.classList.contains('lock')) return;
+  const id = +row.dataset.id, i = picked.indexOf(id);
+  if(i>-1) picked.splice(i,1); else if(picked.length<MAX) picked.push(id);
+  render();
+});
+$('reset').addEventListener('click', ()=>{ picked=[]; render(); });
+
+function vshown(){ return VOLS.filter(x=>x.ok).map(x=>x.v).sort((a,b)=>a-b); }
+function drawVols(){
+  const arr = vshown();
+  if(!arr.includes(vol)) vol = arr[0] || 0;
+  $('vol').innerHTML = arr.map(v=>'<button data-v="'+v+'" aria-pressed="'+(v===vol)+'">'+v+' мл</button>').join('');
+}
+$('vol').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  vol = +b.dataset.v; drawVols(); slip();
+});
+
+function chosen(){ return picked.map(id => DATA.find(p=>p.id===id)); }
+
+function slip(){
+  const one = vol*perMl(), total = MAX*vol*perMl();
+  $('picked').innerHTML = chosen().map(p=>
+    '<div class="item"><div class="t">'+esc(p.name)+'<i>'+esc(p.brand)+' · '+vol+' мл</i></div>'+
+    '<div class="lead"></div><div class="p">'+money(one)+'</div></div>').join('');
+  $('sum').textContent = money(total);
+  $('wa').href = 'https://wa.me/' + PHONE + '?text=' + encodeURIComponent(text());
+}
+function text(){
+  const one = vol*perMl();
+  let out = 'Здравствуйте! Хочу заказать набор из 3 ароматов по ' + vol + ' мл:\n';
+  chosen().forEach((p,i)=> out += (i+1)+'. '+p.brand+' — '+p.name+' — '+money(one)+'\n');
+  return out + '\nИтого: ' + money(MAX*vol*perMl());
+}
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); setTimeout(()=>el.classList.remove('on'),1700); }
+
+$('go').addEventListener('click', ()=>{ drawVols(); slip(); $('sheet').classList.add('on'); });
+$('back').addEventListener('click', ()=> $('sheet').classList.remove('on'));
+$('clear2').addEventListener('click', ()=>{ picked=[]; render(); $('sheet').classList.remove('on'); });
+$('copy').addEventListener('click', ()=> copy(text(), 'Заказ скопирован'));
+
+async function copy(t, msg){
+  try{ await navigator.clipboard.writeText(t); toast(msg); }
+  catch(e){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove(); toast(msg); }
+}
+
+/* ---------- вход в режим владельца: 5 нажатий на заголовок ---------- */
+let taps = 0, tapT = null;
+$('title').addEventListener('click', ()=>{
+  clearTimeout(tapT); taps++;
+  tapT = setTimeout(()=> taps = 0, 1200);
+  if(taps >= 5){ taps = 0; $('modal').classList.add('on'); $('pin').value=''; $('pin').focus(); }
+});
+$('pcancel').addEventListener('click', ()=> $('modal').classList.remove('on'));
+$('pok').addEventListener('click', checkPin);
+$('pin').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
+function checkPin(){
+  if($('pin').value === PIN_CODE){ $('modal').classList.remove('on'); openAdmin(); }
+  else { $('pin').value=''; toast('Неверный код'); }
+}
+
+/* ---------- режим владельца ---------- */
+function openAdmin(){ admin(); $('admin').classList.add('on'); }
+$('aback').addEventListener('click', ()=>{ $('admin').classList.remove('on'); picked=[]; render(); });
+
+function admin(){
+  $('fp').value = BASE;
+  $('fw').value = PHONE;
+  $('fc').value = PIN_CODE;
+  $('perml').textContent = 'Цена за 1 мл: ' + (perMl()).toFixed(2).replace('.',',') +
+    ' ₸ · набор 3 × 30 мл = ' + money(MAX*30*perMl());
+  $('acnt').textContent = '· ' + DATA.filter(p=>p.ok).length + ' из ' + DATA.length + ' показаны';
+  $('vcnt').textContent = '· ' + VOLS.filter(v=>v.ok).length + ' из ' + VOLS.length + ' показаны';
+  $('vlist').innerHTML = VOLS.slice().sort((a,b)=>a.v-b.v).map(x=>
+    '<div class="arow'+(x.ok?'':' hid')+'" data-v="'+x.v+'"><div class="t"><b>'+x.v+' мл</b>'+
+    '<span>набор из 3 — '+money(MAX*x.v*perMl())+'</span></div>'+
+    '<button class="sw'+(x.ok?' on':'')+'" data-a="t">'+(x.ok?'Показан':'Скрыт')+'</button>'+
+    '<button class="del" data-a="d" aria-label="Удалить">✕</button></div>').join('');
+  $('alist').innerHTML = DATA.map(p=>
+    '<div class="arow'+(p.ok?'':' hid')+'" data-id="'+p.id+'"><div class="t"><b>'+esc(p.name)+'</b>'+
+    '<span>'+esc(p.brand)+' · '+esc(p.gender)+'</span></div>'+
+    '<button class="sw'+(p.ok?' on':'')+'" data-a="t">'+(p.ok?'Показан':'Скрыт')+'</button>'+
+    '<button class="del" data-a="d" aria-label="Удалить">✕</button></div>').join('');
+}
+
+$('alist').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  const id = +b.closest('.arow').dataset.id;
+  const p = DATA.find(x=>x.id===id);
+  if(b.dataset.a === 't'){ p.ok = !p.ok; }
+  else { DATA = DATA.filter(x=>x.id!==id); }
+  picked = picked.filter(x => DATA.some(p=>p.id===x && p.ok));
+  admin(); render();
+});
+
+$('vlist').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  const v = +b.closest('.arow').dataset.v;
+  if(b.dataset.a === 't'){ const x = VOLS.find(x=>x.v===v); x.ok = !x.ok; }
+  else { VOLS = VOLS.filter(x=>x.v!==v); }
+  admin(); drawVols(); render();
+});
+
+$('addv').addEventListener('click', ()=>{
+  const v = parseInt($('fv').value, 10);
+  if(!v || v < 1){ toast('Введите объём в мл'); return; }
+  if(VOLS.some(x=>x.v===v)){ toast(v + ' мл уже есть'); return; }
+  VOLS.push({v, ok:true}); $('fv').value='';
+  admin(); drawVols(); render(); toast(v + ' мл добавлен');
+});
+
+$('add').addEventListener('click', ()=>{
+  const brand = $('fb').value.trim(), name = $('fn').value.trim();
+  if(!brand || !name){ toast('Заполните бренд и название'); return; }
+  const id = DATA.reduce((m,p)=>Math.max(m,p.id),0) + 1;
+  DATA.push({id, brand, name, gender:$('fg').value, notes:$('ft').value.trim(), ok:true});
+  DATA.sort((a,b)=> (a.brand+a.name).localeCompare(b.brand+b.name,'ru'));
+  $('fb').value=''; $('fn').value=''; $('ft').value='';
+  admin(); render(); toast(name + ' добавлен');
+});
+
+$('fw').addEventListener('input', e=>{ PHONE = e.target.value.replace(/\D/g,''); });
+$('fc').addEventListener('input', e=>{ const v = e.target.value.trim(); if(v.length >= 4) PIN_CODE = v; });
+$('fp').addEventListener('input', e=>{
+  const v = parseFloat(e.target.value);
+  if(v > 0){ BASE = v; admin(); $('perml').textContent = 'Цена за 1 мл: ' + perMl().toFixed(2).replace('.',',') +
+    ' ₸ · набор 3 × 30 мл = ' + money(MAX*30*perMl()); }
+});
+
+/* ---------- сохранение новой версии файла ---------- */
+function buildFile(){
+  const P = s => '@' + '@' + s + '@' + '@';
+  const emb = $('src').textContent;
+  const ESC = '<' + '\\' + '/script>', TAG = '<' + '/script>';
+  const src = emb.split(ESC).join(TAG);
+  return src.split(P('DATA')).join(JSON.stringify(DATA))
+            .split(P('BASE')).join(String(BASE))
+            .split(P('PIN')).join(PIN_CODE)
+            .split(P('PHONE')).join(PHONE)
+            .split(P('VOLS')).join(JSON.stringify(VOLS))
+            .split(P('TEMPLATE')).join(emb);
+}
+$('save').addEventListener('click', ()=>{
+  try{
+    const blob = new Blob([buildFile()], {type:'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'Набор_3_аромата.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    toast('Файл сохранён — отправляйте его клиентам');
+  }catch(e){ toast('Скачивание заблокировано — откройте файл в браузере'); }
+});
+$('dump').addEventListener('click', ()=>{
+  const t = DATA.map(p=> (p.ok?'':'[скрыт] ') + p.brand + ' — ' + p.name + ' — ' + p.gender +
+    (p.notes ? ' — ' + p.notes : '')).join('\n');
+  copy('Цена набора 3×6 мл: ' + BASE + ' ₸\n\n' + t, 'Список скопирован');
+});
+
+drawVols();
+render();
+</script>
+<script type="text/plain" id="src"><!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Набор из 3 ароматов</title>
+<style>
+:root{
+  --paper:#E7E9E4; --surface:#FBFBF9; --ink:#15181A; --muted:#6B7069;
+  --line:#D3D7CF; --oil:#9A6318; --bottle:#2C4438; --off:#B8382E;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--paper);color:var(--ink);padding-bottom:104px;
+ font:400 16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+header{padding:24px 0 6px}
+h1{font:400 30px/1.08 Georgia,"Times New Roman",serif;margin:0 0 6px;cursor:default;user-select:none}
+.sub{color:var(--muted);font-size:14px}
+.count{color:var(--muted);font-size:13px;padding:20px 2px 7px}
+.row{display:flex;align-items:center;gap:12px;background:var(--surface);
+ border:1px solid var(--line);border-top:0;padding:12px 13px;cursor:pointer}
+.row:first-of-type{border-top:1px solid var(--line)}
+.box{flex:0 0 auto;width:21px;height:21px;border:1px solid var(--line);border-radius:2px;background:#fff;position:relative}
+.row.sel{background:#fff;box-shadow:inset 3px 0 0 var(--oil)}
+.row.sel .box{background:var(--oil);border-color:var(--oil)}
+.row.sel .box::after{content:"";position:absolute;left:6.5px;top:2.5px;width:5px;height:10px;
+ border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.row.lock{opacity:.4;cursor:default}
+.info{flex:1 1 auto;min-width:0}
+.brand{font-size:12px;color:var(--muted)}
+.name{font:400 17px/1.25 Georgia,"Times New Roman",serif;margin-top:1px}
+.notes{font-size:12.5px;color:var(--muted);margin-top:3px}
+.g{flex:0 0 auto;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:100px;padding:2px 8px}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--bottle);color:#fff;
+ padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.bar .inner{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.dotsn{display:flex;gap:5px}
+.dotsn i{width:9px;height:9px;border-radius:50%;border:1px solid rgba(255,255,255,.55)}
+.dotsn i.f{background:#fff;border-color:#fff}
+.n{flex:1 1 auto;font-size:13px;color:rgba(255,255,255,.75)}
+.bar button{border:0;border-radius:2px;background:#fff;color:var(--bottle);
+ font-size:15px;font-weight:600;padding:12px 20px;cursor:pointer}
+.bar button[disabled]{background:rgba(255,255,255,.18);color:rgba(255,255,255,.5);cursor:default}
+.ghost{background:transparent!important;color:rgba(255,255,255,.6)!important;padding:12px 2px!important;font-weight:400!important}
+
+.sheet{position:fixed;inset:0;z-index:40;background:var(--paper);overflow-y:auto;
+ transform:translateX(100%);transition:transform .25s ease}
+.sheet.on{transform:none}
+.back{border:0;background:none;color:var(--ink);font-size:15px;padding:18px 0 6px;cursor:pointer}
+.slip{background:var(--surface);border:1px solid var(--line);padding:20px 18px;margin:6px 0 18px}
+.slip h2{font:400 24px/1.1 Georgia,serif;margin:0 0 14px}
+.vlabel{font-size:12.5px;color:var(--muted);margin-bottom:7px}
+.vol{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:20px}
+.vol button{border:1px solid var(--line);background:transparent;color:var(--muted);
+ padding:10px 0;font-size:14px;border-radius:2px;cursor:pointer}
+.vol button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.item{display:flex;align-items:baseline;gap:8px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.item .t{font:400 16px/1.25 Georgia,serif}
+.item .t i{display:block;font:400 12px/1.3 -apple-system,sans-serif;font-style:normal;color:var(--muted)}
+.lead{flex:1 1 auto;border-bottom:1px dotted var(--line);transform:translateY(-3px)}
+.item .p{font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sumline{display:flex;justify-content:space-between;align-items:baseline;padding:18px 0 0}
+.sumline span{font-size:15px}
+.big{font:400 34px/1 Georgia,serif;font-variant-numeric:tabular-nums}
+.acts{display:flex;flex-direction:column;gap:8px;margin-bottom:40px}
+.acts button,.acts a{display:block;text-align:center;text-decoration:none;border:1px solid var(--ink);
+ background:var(--ink);color:#fff;border-radius:2px;padding:14px;font-size:15px;font-weight:600;cursor:pointer}
+.acts .alt{background:transparent;color:var(--ink)}
+.acts .lite{background:transparent;border-color:var(--line);color:var(--muted);font-weight:400}
+
+/* ---------- режим владельца ---------- */
+.admin{background:#1B211D}
+.admin .wrap{color:#E7E9E4}
+.admin .back{color:#E7E9E4}
+.ahead{padding:4px 0 16px;border-bottom:1px solid #33403A;margin-bottom:18px}
+.ahead h2{font:400 24px/1.1 Georgia,serif;margin:0 0 4px;color:#fff}
+.ahead p{margin:0;font-size:13px;color:#8B968F}
+.card{background:#222A25;border:1px solid #33403A;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font:400 15px/1.2 -apple-system,sans-serif;font-weight:600;color:#fff}
+.f{display:flex;gap:8px;margin-bottom:8px}
+.admin input,.admin select{width:100%;background:#1B211D;border:1px solid #3D4A43;color:#E7E9E4;
+ padding:11px 12px;font-size:15px;border-radius:2px;outline:none}
+.admin input:focus,.admin select:focus{border-color:var(--oil)}
+.admin label{display:block;font-size:12px;color:#8B968F;margin:0 0 4px}
+.addbtn{width:100%;border:0;background:var(--oil);color:#fff;padding:13px;font-size:15px;
+ font-weight:600;border-radius:2px;cursor:pointer;margin-top:4px}
+.arow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #2C3630}
+.arow .t{flex:1 1 auto;min-width:0}
+.arow .t b{display:block;font:400 16px/1.2 Georgia,serif;font-weight:400;color:#fff}
+.arow .t span{font-size:12px;color:#8B968F}
+.arow.hid .t b{color:#6E7B74;text-decoration:line-through}
+.sw{border:1px solid #3D4A43;background:transparent;color:#8B968F;font-size:12px;
+ padding:7px 11px;border-radius:100px;cursor:pointer;white-space:nowrap}
+.sw.on{background:#2F4A3C;border-color:#3E6350;color:#DDEBD8}
+.del{border:0;background:none;color:#7A5450;font-size:18px;padding:4px 2px;cursor:pointer}
+.aacts{display:flex;flex-direction:column;gap:8px;margin:18px 0 40px}
+.aacts button{border:0;border-radius:2px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;
+ background:#fff;color:#1B211D}
+.aacts .alt{background:transparent;border:1px solid #3D4A43;color:#E7E9E4;font-weight:400}
+.hint{font-size:12.5px;color:#8B968F;line-height:1.5;margin:0 0 6px}
+
+.modal{position:fixed;inset:0;z-index:70;background:rgba(21,24,26,.55);display:none;
+ align-items:center;justify-content:center;padding:20px}
+.modal.on{display:flex}
+.modal .in{background:var(--surface);border:1px solid var(--line);padding:20px;width:100%;max-width:300px}
+.modal h3{margin:0 0 12px;font:400 19px/1.2 Georgia,serif}
+.modal input{width:100%;padding:12px;font-size:18px;border:1px solid var(--line);border-radius:2px;
+ text-align:center;letter-spacing:.3em;outline:none}
+.modal .mb{display:flex;gap:8px;margin-top:12px}
+.modal .mb button{flex:1;border:1px solid var(--ink);background:var(--ink);color:#fff;padding:12px;
+ border-radius:2px;font-size:15px;cursor:pointer}
+.modal .mb .c{background:transparent;color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--ink);color:#fff;
+ padding:11px 18px;border-radius:2px;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:80}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1 id="title">Соберите набор из 3 ароматов</h1>
+    <div class="sub">Выберите три аромата, затем объём — цена посчитается сама.</div>
+  </header>
+  <div class="count" id="cnt"></div>
+  <div id="list"></div>
+</div>
+
+<div class="bar">
+  <div class="inner">
+    <div class="dotsn" id="dots"></div>
+    <div class="n" id="n">Выбрано 0 из 3</div>
+    <button class="ghost" id="reset">Сбросить</button>
+    <button id="go" disabled>Далее</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="wrap">
+    <button class="back" id="back">← Изменить выбор</button>
+    <div class="slip">
+      <h2>Ваш набор</h2>
+      <div class="vlabel">Объём каждого флакона</div>
+      <div class="vol" id="vol"></div>
+      <div id="picked"></div>
+      <div class="sumline"><span>Итого за набор</span><b class="big" id="sum"></b></div>
+    </div>
+    <div class="acts">
+      <a id="wa" href="#" target="_blank" rel="noopener">Отправить заказ в WhatsApp</a>
+      <button class="alt" id="copy">Скопировать заказ</button>
+      <button class="lite" id="clear2">Собрать заново</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet admin" id="admin">
+  <div class="wrap">
+    <button class="back" id="aback">← Выйти из редактирования</button>
+    <div class="ahead">
+      <h2>Режим владельца</h2>
+      <p>Клиент этот экран не видит. Изменения нужно сохранить в новый файл.</p>
+    </div>
+
+    <div class="card">
+      <h3>Добавить аромат</h3>
+      <div class="f">
+        <div style="flex:1"><label>Бренд</label><input id="fb" placeholder="Tom Ford"></div>
+        <div style="flex:0 0 116px"><label>Пол</label>
+          <select id="fg"><option>Унисекс</option><option>Мужской</option><option>Женский</option></select></div>
+      </div>
+      <label>Название</label><input id="fn" placeholder="Lost Cherry">
+      <div style="height:8px"></div>
+      <label>Ноты — коротко</label><input id="ft" placeholder="вишня, миндаль, ликёр">
+      <button class="addbtn" id="add">Добавить в список</button>
+    </div>
+
+    <div class="card">
+      <h3>Цена</h3>
+      <label>Стоимость набора 3 × 6 мл, ₸</label>
+      <input id="fp" type="number" inputmode="numeric">
+      <p class="hint" style="margin-top:8px" id="perml"></p>
+    </div>
+
+    <div class="card">
+      <h3>Объёмы <span style="color:#8B968F;font-weight:400" id="vcnt"></span></h3>
+      <p class="hint">Клиент выбирает только показанные объёмы. Нет флакона — скройте, появится — включите обратно.</p>
+      <div id="vlist"></div>
+      <div style="height:12px"></div>
+      <label>Добавить объём, мл</label>
+      <div class="f">
+        <input id="fv" type="number" inputmode="numeric" placeholder="75">
+        <button class="addbtn" id="addv" style="margin-top:0;flex:0 0 120px">Добавить</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Контакт и доступ</h3>
+      <label>WhatsApp для заказов — только цифры</label>
+      <input id="fw" inputmode="numeric" placeholder="77071697002">
+      <div style="height:8px"></div>
+      <label>Код входа в этот режим</label>
+      <input id="fc" inputmode="numeric" maxlength="6">
+      <p class="hint" style="margin-top:8px">Новый код заработает в файле, который вы сохраните ниже. Запишите его.</p>
+    </div>
+
+    <div class="card">
+      <h3>Список <span style="color:#8B968F;font-weight:400" id="acnt"></span></h3>
+      <p class="hint">«Показан» — аромат видит клиент. «Скрыт» — исчезает из подбора совсем.</p>
+      <div id="alist"></div>
+    </div>
+
+    <div class="aacts">
+      <button id="save">Сохранить файл для клиентов</button>
+      <button class="alt" id="dump">Скопировать список текстом</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="in">
+    <h3>Код доступа</h3>
+    <input id="pin" type="password" inputmode="numeric" maxlength="6" placeholder="••••">
+    <div class="mb"><button class="c" id="pcancel">Отмена</button><button id="pok">Войти</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let DATA = @@DATA@@;
+let BASE = @@BASE@@;              // цена набора 3 × 6 мл
+let PIN_CODE = "@@PIN@@";         // код входа в режим владельца
+let PHONE = "@@PHONE@@";          // WhatsApp для заказов
+let VOLS = @@VOLS@@;
+const MAX = 3, BASE_ML = 6;
+
+const $ = id => document.getElementById(id);
+const perMl = () => BASE / (MAX * BASE_ML);
+const money = n => Math.round(n).toLocaleString('ru-RU').replace(/\u00A0/g,' ') + ' ₸';
+
+let vol = 0, picked = [];
+
+/* ---------- клиентский экран ---------- */
+function shown(){ return DATA.filter(p => p.ok); }
+
+function render(){
+  const arr = shown();
+  $('cnt').textContent = arr.length + ' ароматов в наличии';
+  $('list').innerHTML = arr.map(p=>{
+    const sel = picked.includes(p.id), lock = !sel && picked.length >= MAX;
+    return '<div class="row'+(sel?' sel':'')+(lock?' lock':'')+'" data-id="'+p.id+'">'+
+      '<div class="box"></div><div class="info"><div class="brand">'+esc(p.brand)+'</div>'+
+      '<div class="name">'+esc(p.name)+'</div>'+
+      (p.notes?'<div class="notes">'+esc(p.notes)+'</div>':'')+'</div>'+
+      '<div class="g">'+esc(p.gender)+'</div></div>';
+  }).join('');
+  $('dots').innerHTML = [0,1,2].map(i=>'<i class="'+(i<picked.length?'f':'')+'"></i>').join('');
+  $('n').textContent = picked.length===MAX ? 'Набор собран' : 'Выбрано '+picked.length+' из 3';
+  $('go').disabled = picked.length !== MAX || vshown().length === 0;
+}
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+$('list').addEventListener('click', e=>{
+  const row = e.target.closest('.row'); if(!row || row.classList.contains('lock')) return;
+  const id = +row.dataset.id, i = picked.indexOf(id);
+  if(i>-1) picked.splice(i,1); else if(picked.length<MAX) picked.push(id);
+  render();
+});
+$('reset').addEventListener('click', ()=>{ picked=[]; render(); });
+
+function vshown(){ return VOLS.filter(x=>x.ok).map(x=>x.v).sort((a,b)=>a-b); }
+function drawVols(){
+  const arr = vshown();
+  if(!arr.includes(vol)) vol = arr[0] || 0;
+  $('vol').innerHTML = arr.map(v=>'<button data-v="'+v+'" aria-pressed="'+(v===vol)+'">'+v+' мл</button>').join('');
+}
+$('vol').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  vol = +b.dataset.v; drawVols(); slip();
+});
+
+function chosen(){ return picked.map(id => DATA.find(p=>p.id===id)); }
+
+function slip(){
+  const one = vol*perMl(), total = MAX*vol*perMl();
+  $('picked').innerHTML = chosen().map(p=>
+    '<div class="item"><div class="t">'+esc(p.name)+'<i>'+esc(p.brand)+' · '+vol+' мл</i></div>'+
+    '<div class="lead"></div><div class="p">'+money(one)+'</div></div>').join('');
+  $('sum').textContent = money(total);
+  $('wa').href = 'https://wa.me/' + PHONE + '?text=' + encodeURIComponent(text());
+}
+function text(){
+  const one = vol*perMl();
+  let out = 'Здравствуйте! Хочу заказать набор из 3 ароматов по ' + vol + ' мл:\n';
+  chosen().forEach((p,i)=> out += (i+1)+'. '+p.brand+' — '+p.name+' — '+money(one)+'\n');
+  return out + '\nИтого: ' + money(MAX*vol*perMl());
+}
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); setTimeout(()=>el.classList.remove('on'),1700); }
+
+$('go').addEventListener('click', ()=>{ drawVols(); slip(); $('sheet').classList.add('on'); });
+$('back').addEventListener('click', ()=> $('sheet').classList.remove('on'));
+$('clear2').addEventListener('click', ()=>{ picked=[]; render(); $('sheet').classList.remove('on'); });
+$('copy').addEventListener('click', ()=> copy(text(), 'Заказ скопирован'));
+
+async function copy(t, msg){
+  try{ await navigator.clipboard.writeText(t); toast(msg); }
+  catch(e){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove(); toast(msg); }
+}
+
+/* ---------- вход в режим владельца: 5 нажатий на заголовок ---------- */
+let taps = 0, tapT = null;
+$('title').addEventListener('click', ()=>{
+  clearTimeout(tapT); taps++;
+  tapT = setTimeout(()=> taps = 0, 1200);
+  if(taps >= 5){ taps = 0; $('modal').classList.add('on'); $('pin').value=''; $('pin').focus(); }
+});
+$('pcancel').addEventListener('click', ()=> $('modal').classList.remove('on'));
+$('pok').addEventListener('click', checkPin);
+$('pin').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
+function checkPin(){
+  if($('pin').value === PIN_CODE){ $('modal').classList.remove('on'); openAdmin(); }
+  else { $('pin').value=''; toast('Неверный код'); }
+}
+
+/* ---------- режим владельца ---------- */
+function openAdmin(){ admin(); $('admin').classList.add('on'); }
+$('aback').addEventListener('click', ()=>{ $('admin').classList.remove('on'); picked=[]; render(); });
+
+function admin(){
+  $('fp').value = BASE;
+  $('fw').value = PHONE;
+  $('fc').value = PIN_CODE;
+  $('perml').textContent = 'Цена за 1 мл: ' + (perMl()).toFixed(2).replace('.',',') +
+    ' ₸ · набор 3 × 30 мл = ' + money(MAX*30*perMl());
+  $('acnt').textContent = '· ' + DATA.filter(p=>p.ok).length + ' из ' + DATA.length + ' показаны';
+  $('vcnt').textContent = '· ' + VOLS.filter(v=>v.ok).length + ' из ' + VOLS.length + ' показаны';
+  $('vlist').innerHTML = VOLS.slice().sort((a,b)=>a.v-b.v).map(x=>
+    '<div class="arow'+(x.ok?'':' hid')+'" data-v="'+x.v+'"><div class="t"><b>'+x.v+' мл</b>'+
+    '<span>набор из 3 — '+money(MAX*x.v*perMl())+'</span></div>'+
+    '<button class="sw'+(x.ok?' on':'')+'" data-a="t">'+(x.ok?'Показан':'Скрыт')+'</button>'+
+    '<button class="del" data-a="d" aria-label="Удалить">✕</button></div>').join('');
+  $('alist').innerHTML = DATA.map(p=>
+    '<div class="arow'+(p.ok?'':' hid')+'" data-id="'+p.id+'"><div class="t"><b>'+esc(p.name)+'</b>'+
+    '<span>'+esc(p.brand)+' · '+esc(p.gender)+'</span></div>'+
+    '<button class="sw'+(p.ok?' on':'')+'" data-a="t">'+(p.ok?'Показан':'Скрыт')+'</button>'+
+    '<button class="del" data-a="d" aria-label="Удалить">✕</button></div>').join('');
+}
+
+$('alist').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  const id = +b.closest('.arow').dataset.id;
+  const p = DATA.find(x=>x.id===id);
+  if(b.dataset.a === 't'){ p.ok = !p.ok; }
+  else { DATA = DATA.filter(x=>x.id!==id); }
+  picked = picked.filter(x => DATA.some(p=>p.id===x && p.ok));
+  admin(); render();
+});
+
+$('vlist').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  const v = +b.closest('.arow').dataset.v;
+  if(b.dataset.a === 't'){ const x = VOLS.find(x=>x.v===v); x.ok = !x.ok; }
+  else { VOLS = VOLS.filter(x=>x.v!==v); }
+  admin(); drawVols(); render();
+});
+
+$('addv').addEventListener('click', ()=>{
+  const v = parseInt($('fv').value, 10);
+  if(!v || v < 1){ toast('Введите объём в мл'); return; }
+  if(VOLS.some(x=>x.v===v)){ toast(v + ' мл уже есть'); return; }
+  VOLS.push({v, ok:true}); $('fv').value='';
+  admin(); drawVols(); render(); toast(v + ' мл добавлен');
+});
+
+$('add').addEventListener('click', ()=>{
+  const brand = $('fb').value.trim(), name = $('fn').value.trim();
+  if(!brand || !name){ toast('Заполните бренд и название'); return; }
+  const id = DATA.reduce((m,p)=>Math.max(m,p.id),0) + 1;
+  DATA.push({id, brand, name, gender:$('fg').value, notes:$('ft').value.trim(), ok:true});
+  DATA.sort((a,b)=> (a.brand+a.name).localeCompare(b.brand+b.name,'ru'));
+  $('fb').value=''; $('fn').value=''; $('ft').value='';
+  admin(); render(); toast(name + ' добавлен');
+});
+
+$('fw').addEventListener('input', e=>{ PHONE = e.target.value.replace(/\D/g,''); });
+$('fc').addEventListener('input', e=>{ const v = e.target.value.trim(); if(v.length >= 4) PIN_CODE = v; });
+$('fp').addEventListener('input', e=>{
+  const v = parseFloat(e.target.value);
+  if(v > 0){ BASE = v; admin(); $('perml').textContent = 'Цена за 1 мл: ' + perMl().toFixed(2).replace('.',',') +
+    ' ₸ · набор 3 × 30 мл = ' + money(MAX*30*perMl()); }
+});
+
+/* ---------- сохранение новой версии файла ---------- */
+function buildFile(){
+  const P = s => '@' + '@' + s + '@' + '@';
+  const emb = $('src').textContent;
+  const ESC = '<' + '\\' + '/script>', TAG = '<' + '/script>';
+  const src = emb.split(ESC).join(TAG);
+  return src.split(P('DATA')).join(JSON.stringify(DATA))
+            .split(P('BASE')).join(String(BASE))
+            .split(P('PIN')).join(PIN_CODE)
+            .split(P('PHONE')).join(PHONE)
+            .split(P('VOLS')).join(JSON.stringify(VOLS))
+            .split(P('TEMPLATE')).join(emb);
+}
+$('save').addEventListener('click', ()=>{
+  try{
+    const blob = new Blob([buildFile()], {type:'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'Набор_3_аромата.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    toast('Файл сохранён — отправляйте его клиентам');
+  }catch(e){ toast('Скачивание заблокировано — откройте файл в браузере'); }
+});
+$('dump').addEventListener('click', ()=>{
+  const t = DATA.map(p=> (p.ok?'':'[скрыт] ') + p.brand + ' — ' + p.name + ' — ' + p.gender +
+    (p.notes ? ' — ' + p.notes : '')).join('\n');
+  copy('Цена набора 3×6 мл: ' + BASE + ' ₸\n\n' + t, 'Список скопирован');
+});
+
+drawVols();
+render();
+<\/script>
+<script type="text/plain" id="src">@@TEMPLATE@@<\/script>
+</body>
+</html>
+</script>
+</body>
+</html>
