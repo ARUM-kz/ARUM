@@ -184,6 +184,18 @@ h1{font:400 30px/1.08 Georgia,"Times New Roman",serif;margin:0 0 6px;cursor:defa
     </div>
 
     <div class="card">
+      <h3>Объёмы <span style="color:#8B968F;font-weight:400" id="vcnt"></span></h3>
+      <p class="hint">Клиент выбирает только показанные объёмы. Нет флакона — скройте, появится — включите обратно.</p>
+      <div id="vlist"></div>
+      <div style="height:12px"></div>
+      <label>Добавить объём, мл</label>
+      <div class="f">
+        <input id="fv" type="number" inputmode="numeric" placeholder="75">
+        <button class="addbtn" id="addv" style="margin-top:0;flex:0 0 120px">Добавить</button>
+      </div>
+    </div>
+
+    <div class="card">
       <h3>Контакт и доступ</h3>
       <label>WhatsApp для заказов — только цифры</label>
       <input id="fw" inputmode="numeric" placeholder="77071697002">
@@ -217,18 +229,18 @@ h1{font:400 30px/1.08 Georgia,"Times New Roman",serif;margin:0 0 6px;cursor:defa
 <div class="toast" id="toast"></div>
 
 <script>
-let DATA = [{"id":1,"brand":"Amouage","name":"Guidance","gender":"Унисекс","notes":"ваниль, ирис, шафран — плотный сладко-пряный","ok":true},{"id":2,"brand":"Bvlgari","name":"Tyger","gender":"Унисекс","notes":"","ok":false},{"id":3,"brand":"By Kilian","name":"Good Girl Gone Bad","gender":"Женский","notes":"тубероза, слива, жасмин — тёмный цветочный","ok":true},{"id":4,"brand":"Byredo","name":"Bal d'Afrique","gender":"Унисекс","notes":"фиалка, нероли, ветивер — тёплый цитрус","ok":true},{"id":5,"brand":"Byredo","name":"Blanche","gender":"Унисекс","notes":"белый мускус, альдегиды — «чистое бельё»","ok":true},{"id":7,"brand":"Clive Christian","name":"Blonde Amber","gender":"Унисекс","notes":"тёплая амбра, ваниль, специи","ok":true},{"id":8,"brand":"Clive Christian","name":"Matsukita","gender":"Унисекс","notes":"дымный, пряный, с чайными нотами","ok":true},{"id":9,"brand":"Creed","name":"Aventus","gender":"Мужской","notes":"ананас, берёзовый дым, мускус — статусный","ok":true},{"id":10,"brand":"Creed","name":"Silver Mountain Water","gender":"Унисекс","notes":"чёрная смородина, чай, мускус — свежий","ok":true},{"id":6,"brand":"Dior","name":"J'adore","gender":"Женский","notes":"иланг-иланг, роза, жасмин — женская классика","ok":true},{"id":12,"brand":"Ex Nihilo","name":"Blue Talisman","gender":"Унисекс","notes":"цитрус, морская свежесть, амбра","ok":true},{"id":11,"brand":"Giorgio Armani","name":"Emporio Armani Stronger With You","gender":"Мужской","notes":"кардамон, каштан, ваниль — сладкий тёплый","ok":true},{"id":13,"brand":"Louis Vuitton","name":"Afternoon Swim","gender":"Унисекс","notes":"апельсин, мандарин — солнечный цитрус","ok":true},{"id":14,"brand":"Louis Vuitton","name":"Imagination","gender":"Мужской","notes":"чай, цитрус, амбра — лёгкий нишевый","ok":false},{"id":15,"brand":"Louis Vuitton","name":"Pacific Chill","gender":"Унисекс","notes":"","ok":false},{"id":16,"brand":"Maison Crivelli","name":"Maracuja","gender":"Унисекс","notes":"","ok":false},{"id":17,"brand":"Marc-Antoine Barrois","name":"Ganymede","gender":"Унисекс","notes":"мандарин, замша, минеральный — «космос»","ok":true},{"id":18,"brand":"Nishane","name":"Hacivat","gender":"Унисекс","notes":"ананас, пачули, дерево — плотный фруктово-древесный","ok":true},{"id":19,"brand":"Parfums de Marly","name":"Layton","gender":"Мужской","notes":"яблоко, лаванда, ваниль — сладко-пряный","ok":true},{"id":20,"brand":"Roja Dove","name":"Elysium","gender":"Мужской","notes":"грейпфрут, лимон, кедр — свежий дорогой","ok":true},{"id":21,"brand":"Tom Ford","name":"Lost Cherry","gender":"Унисекс","notes":"вишня, миндаль, ликёр — сладкий гурман","ok":true}];
+let DATA = [{"id":1,"brand":"Amouage","name":"Guidance","gender":"Унисекс","notes":"ваниль, ирис, шафран — плотный сладко-пряный","ok":true},{"id":2,"brand":"Bvlgari","name":"Tyger","gender":"Унисекс","notes":"","ok":false},{"id":3,"brand":"By Kilian","name":"Good Girl Gone Bad","gender":"Женский","notes":"тубероза, слива, жасмин — тёмный цветочный","ok":true},{"id":4,"brand":"Byredo","name":"Bal d'Afrique","gender":"Унисекс","notes":"фиалка, нероли, ветивер — тёплый цитрус","ok":true},{"id":5,"brand":"Byredo","name":"Blanche","gender":"Унисекс","notes":"белый мускус, альдегиды — «чистое бельё»","ok":true},{"id":7,"brand":"Clive Christian","name":"Blonde Amber","gender":"Унисекс","notes":"тёплая амбра, ваниль, специи","ok":true},{"id":8,"brand":"Clive Christian","name":"Matsukita","gender":"Унисекс","notes":"дымный, пряный, с чайными нотами","ok":true},{"id":9,"brand":"Creed","name":"Aventus","gender":"Мужской","notes":"ананас, берёзовый дым, мускус — статусный","ok":true},{"id":10,"brand":"Creed","name":"Silver Mountain Water","gender":"Унисекс","notes":"чёрная смородина, чай, мускус — свежий","ok":true},{"id":6,"brand":"Dior","name":"J'adore","gender":"Женский","notes":"иланг-иланг, роза, жасмин — женская классика","ok":true},{"id":12,"brand":"Ex Nihilo","name":"Blue Talisman","gender":"Унисекс","notes":"цитрус, морская свежесть, амбра","ok":true},{"id":11,"brand":"Giorgio Armani","name":"Emporio Armani Stronger With You","gender":"Мужской","notes":"кардамон, каштан, ваниль — сладкий тёплый","ok":true},{"id":13,"brand":"Louis Vuitton","name":"Afternoon Swim","gender":"Унисекс","notes":"апельсин, мандарин — солнечный цитрус","ok":true},{"id":14,"brand":"Louis Vuitton","name":"Imagination","gender":"Мужской","notes":"чай, цитрус, амбра — лёгкий нишевый","ok":true},{"id":15,"brand":"Louis Vuitton","name":"Pacific Chill","gender":"Унисекс","notes":"","ok":false},{"id":16,"brand":"Maison Crivelli","name":"Maracuja","gender":"Унисекс","notes":"","ok":false},{"id":17,"brand":"Marc-Antoine Barrois","name":"Ganymede","gender":"Унисекс","notes":"мандарин, замша, минеральный — «космос»","ok":true},{"id":18,"brand":"Nishane","name":"Hacivat","gender":"Унисекс","notes":"ананас, пачули, дерево — плотный фруктово-древесный","ok":true},{"id":19,"brand":"Parfums de Marly","name":"Layton","gender":"Мужской","notes":"яблоко, лаванда, ваниль — сладко-пряный","ok":true},{"id":20,"brand":"Roja Dove","name":"Elysium","gender":"Мужской","notes":"грейпфрут, лимон, кедр — свежий дорогой","ok":true},{"id":21,"brand":"Tom Ford","name":"Lost Cherry","gender":"Унисекс","notes":"вишня, миндаль, ликёр — сладкий гурман","ok":true}];
 let BASE = 12000;              // цена набора 3 × 6 мл
 let PIN_CODE = "2902";         // код входа в режим владельца
 let PHONE = "77071697002";          // WhatsApp для заказов
-const VOLUMES = [6,10,15,20,25,30,50,100];
+let VOLS = [{"v":6,"ok":true},{"v":10,"ok":true},{"v":15,"ok":true},{"v":20,"ok":true},{"v":25,"ok":true},{"v":30,"ok":true},{"v":50,"ok":true},{"v":100,"ok":true}];
 const MAX = 3, BASE_ML = 6;
 
 const $ = id => document.getElementById(id);
 const perMl = () => BASE / (MAX * BASE_ML);
 const money = n => Math.round(n).toLocaleString('ru-RU').replace(/\u00A0/g,' ') + ' ₸';
 
-let vol = 6, picked = [];
+let vol = 0, picked = [];
 
 /* ---------- клиентский экран ---------- */
 function shown(){ return DATA.filter(p => p.ok); }
@@ -246,7 +258,7 @@ function render(){
   }).join('');
   $('dots').innerHTML = [0,1,2].map(i=>'<i class="'+(i<picked.length?'f':'')+'"></i>').join('');
   $('n').textContent = picked.length===MAX ? 'Набор собран' : 'Выбрано '+picked.length+' из 3';
-  $('go').disabled = picked.length !== MAX;
+  $('go').disabled = picked.length !== MAX || vshown().length === 0;
 }
 function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 
@@ -258,12 +270,15 @@ $('list').addEventListener('click', e=>{
 });
 $('reset').addEventListener('click', ()=>{ picked=[]; render(); });
 
-$('vol').innerHTML = VOLUMES.map(v=>'<button data-v="'+v+'" aria-pressed="'+(v===6)+'">'+v+' мл</button>').join('');
+function vshown(){ return VOLS.filter(x=>x.ok).map(x=>x.v).sort((a,b)=>a-b); }
+function drawVols(){
+  const arr = vshown();
+  if(!arr.includes(vol)) vol = arr[0] || 0;
+  $('vol').innerHTML = arr.map(v=>'<button data-v="'+v+'" aria-pressed="'+(v===vol)+'">'+v+' мл</button>').join('');
+}
 $('vol').addEventListener('click', e=>{
   const b = e.target.closest('button'); if(!b) return;
-  vol = +b.dataset.v;
-  [...$('vol').children].forEach(x=>x.setAttribute('aria-pressed', x===b));
-  slip();
+  vol = +b.dataset.v; drawVols(); slip();
 });
 
 function chosen(){ return picked.map(id => DATA.find(p=>p.id===id)); }
@@ -284,7 +299,7 @@ function text(){
 }
 function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); setTimeout(()=>el.classList.remove('on'),1700); }
 
-$('go').addEventListener('click', ()=>{ slip(); $('sheet').classList.add('on'); });
+$('go').addEventListener('click', ()=>{ drawVols(); slip(); $('sheet').classList.add('on'); });
 $('back').addEventListener('click', ()=> $('sheet').classList.remove('on'));
 $('clear2').addEventListener('click', ()=>{ picked=[]; render(); $('sheet').classList.remove('on'); });
 $('copy').addEventListener('click', ()=> copy(text(), 'Заказ скопирован'));
@@ -321,6 +336,12 @@ function admin(){
   $('perml').textContent = 'Цена за 1 мл: ' + (perMl()).toFixed(2).replace('.',',') +
     ' ₸ · набор 3 × 30 мл = ' + money(MAX*30*perMl());
   $('acnt').textContent = '· ' + DATA.filter(p=>p.ok).length + ' из ' + DATA.length + ' показаны';
+  $('vcnt').textContent = '· ' + VOLS.filter(v=>v.ok).length + ' из ' + VOLS.length + ' показаны';
+  $('vlist').innerHTML = VOLS.slice().sort((a,b)=>a.v-b.v).map(x=>
+    '<div class="arow'+(x.ok?'':' hid')+'" data-v="'+x.v+'"><div class="t"><b>'+x.v+' мл</b>'+
+    '<span>набор из 3 — '+money(MAX*x.v*perMl())+'</span></div>'+
+    '<button class="sw'+(x.ok?' on':'')+'" data-a="t">'+(x.ok?'Показан':'Скрыт')+'</button>'+
+    '<button class="del" data-a="d" aria-label="Удалить">✕</button></div>').join('');
   $('alist').innerHTML = DATA.map(p=>
     '<div class="arow'+(p.ok?'':' hid')+'" data-id="'+p.id+'"><div class="t"><b>'+esc(p.name)+'</b>'+
     '<span>'+esc(p.brand)+' · '+esc(p.gender)+'</span></div>'+
@@ -338,6 +359,22 @@ $('alist').addEventListener('click', e=>{
   admin(); render();
 });
 
+$('vlist').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  const v = +b.closest('.arow').dataset.v;
+  if(b.dataset.a === 't'){ const x = VOLS.find(x=>x.v===v); x.ok = !x.ok; }
+  else { VOLS = VOLS.filter(x=>x.v!==v); }
+  admin(); drawVols(); render();
+});
+
+$('addv').addEventListener('click', ()=>{
+  const v = parseInt($('fv').value, 10);
+  if(!v || v < 1){ toast('Введите объём в мл'); return; }
+  if(VOLS.some(x=>x.v===v)){ toast(v + ' мл уже есть'); return; }
+  VOLS.push({v, ok:true}); $('fv').value='';
+  admin(); drawVols(); render(); toast(v + ' мл добавлен');
+});
+
 $('add').addEventListener('click', ()=>{
   const brand = $('fb').value.trim(), name = $('fn').value.trim();
   if(!brand || !name){ toast('Заполните бренд и название'); return; }
@@ -352,7 +389,7 @@ $('fw').addEventListener('input', e=>{ PHONE = e.target.value.replace(/\D/g,'');
 $('fc').addEventListener('input', e=>{ const v = e.target.value.trim(); if(v.length >= 4) PIN_CODE = v; });
 $('fp').addEventListener('input', e=>{
   const v = parseFloat(e.target.value);
-  if(v > 0){ BASE = v; $('perml').textContent = 'Цена за 1 мл: ' + perMl().toFixed(2).replace('.',',') +
+  if(v > 0){ BASE = v; admin(); $('perml').textContent = 'Цена за 1 мл: ' + perMl().toFixed(2).replace('.',',') +
     ' ₸ · набор 3 × 30 мл = ' + money(MAX*30*perMl()); }
 });
 
@@ -366,6 +403,7 @@ function buildFile(){
             .split(P('BASE')).join(String(BASE))
             .split(P('PIN')).join(PIN_CODE)
             .split(P('PHONE')).join(PHONE)
+            .split(P('VOLS')).join(JSON.stringify(VOLS))
             .split(P('TEMPLATE')).join(emb);
 }
 $('save').addEventListener('click', ()=>{
@@ -385,6 +423,7 @@ $('dump').addEventListener('click', ()=>{
   copy('Цена набора 3×6 мл: ' + BASE + ' ₸\n\n' + t, 'Список скопирован');
 });
 
+drawVols();
 render();
 </script>
 <script type="text/plain" id="src"><!DOCTYPE html>
@@ -573,6 +612,18 @@ h1{font:400 30px/1.08 Georgia,"Times New Roman",serif;margin:0 0 6px;cursor:defa
     </div>
 
     <div class="card">
+      <h3>Объёмы <span style="color:#8B968F;font-weight:400" id="vcnt"></span></h3>
+      <p class="hint">Клиент выбирает только показанные объёмы. Нет флакона — скройте, появится — включите обратно.</p>
+      <div id="vlist"></div>
+      <div style="height:12px"></div>
+      <label>Добавить объём, мл</label>
+      <div class="f">
+        <input id="fv" type="number" inputmode="numeric" placeholder="75">
+        <button class="addbtn" id="addv" style="margin-top:0;flex:0 0 120px">Добавить</button>
+      </div>
+    </div>
+
+    <div class="card">
       <h3>Контакт и доступ</h3>
       <label>WhatsApp для заказов — только цифры</label>
       <input id="fw" inputmode="numeric" placeholder="77071697002">
@@ -610,14 +661,14 @@ let DATA = @@DATA@@;
 let BASE = @@BASE@@;              // цена набора 3 × 6 мл
 let PIN_CODE = "@@PIN@@";         // код входа в режим владельца
 let PHONE = "@@PHONE@@";          // WhatsApp для заказов
-const VOLUMES = [6,10,15,20,25,30,50,100];
+let VOLS = @@VOLS@@;
 const MAX = 3, BASE_ML = 6;
 
 const $ = id => document.getElementById(id);
 const perMl = () => BASE / (MAX * BASE_ML);
 const money = n => Math.round(n).toLocaleString('ru-RU').replace(/\u00A0/g,' ') + ' ₸';
 
-let vol = 6, picked = [];
+let vol = 0, picked = [];
 
 /* ---------- клиентский экран ---------- */
 function shown(){ return DATA.filter(p => p.ok); }
@@ -635,7 +686,7 @@ function render(){
   }).join('');
   $('dots').innerHTML = [0,1,2].map(i=>'<i class="'+(i<picked.length?'f':'')+'"></i>').join('');
   $('n').textContent = picked.length===MAX ? 'Набор собран' : 'Выбрано '+picked.length+' из 3';
-  $('go').disabled = picked.length !== MAX;
+  $('go').disabled = picked.length !== MAX || vshown().length === 0;
 }
 function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 
@@ -647,12 +698,15 @@ $('list').addEventListener('click', e=>{
 });
 $('reset').addEventListener('click', ()=>{ picked=[]; render(); });
 
-$('vol').innerHTML = VOLUMES.map(v=>'<button data-v="'+v+'" aria-pressed="'+(v===6)+'">'+v+' мл</button>').join('');
+function vshown(){ return VOLS.filter(x=>x.ok).map(x=>x.v).sort((a,b)=>a-b); }
+function drawVols(){
+  const arr = vshown();
+  if(!arr.includes(vol)) vol = arr[0] || 0;
+  $('vol').innerHTML = arr.map(v=>'<button data-v="'+v+'" aria-pressed="'+(v===vol)+'">'+v+' мл</button>').join('');
+}
 $('vol').addEventListener('click', e=>{
   const b = e.target.closest('button'); if(!b) return;
-  vol = +b.dataset.v;
-  [...$('vol').children].forEach(x=>x.setAttribute('aria-pressed', x===b));
-  slip();
+  vol = +b.dataset.v; drawVols(); slip();
 });
 
 function chosen(){ return picked.map(id => DATA.find(p=>p.id===id)); }
@@ -673,7 +727,7 @@ function text(){
 }
 function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); setTimeout(()=>el.classList.remove('on'),1700); }
 
-$('go').addEventListener('click', ()=>{ slip(); $('sheet').classList.add('on'); });
+$('go').addEventListener('click', ()=>{ drawVols(); slip(); $('sheet').classList.add('on'); });
 $('back').addEventListener('click', ()=> $('sheet').classList.remove('on'));
 $('clear2').addEventListener('click', ()=>{ picked=[]; render(); $('sheet').classList.remove('on'); });
 $('copy').addEventListener('click', ()=> copy(text(), 'Заказ скопирован'));
@@ -710,6 +764,12 @@ function admin(){
   $('perml').textContent = 'Цена за 1 мл: ' + (perMl()).toFixed(2).replace('.',',') +
     ' ₸ · набор 3 × 30 мл = ' + money(MAX*30*perMl());
   $('acnt').textContent = '· ' + DATA.filter(p=>p.ok).length + ' из ' + DATA.length + ' показаны';
+  $('vcnt').textContent = '· ' + VOLS.filter(v=>v.ok).length + ' из ' + VOLS.length + ' показаны';
+  $('vlist').innerHTML = VOLS.slice().sort((a,b)=>a.v-b.v).map(x=>
+    '<div class="arow'+(x.ok?'':' hid')+'" data-v="'+x.v+'"><div class="t"><b>'+x.v+' мл</b>'+
+    '<span>набор из 3 — '+money(MAX*x.v*perMl())+'</span></div>'+
+    '<button class="sw'+(x.ok?' on':'')+'" data-a="t">'+(x.ok?'Показан':'Скрыт')+'</button>'+
+    '<button class="del" data-a="d" aria-label="Удалить">✕</button></div>').join('');
   $('alist').innerHTML = DATA.map(p=>
     '<div class="arow'+(p.ok?'':' hid')+'" data-id="'+p.id+'"><div class="t"><b>'+esc(p.name)+'</b>'+
     '<span>'+esc(p.brand)+' · '+esc(p.gender)+'</span></div>'+
@@ -727,6 +787,22 @@ $('alist').addEventListener('click', e=>{
   admin(); render();
 });
 
+$('vlist').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  const v = +b.closest('.arow').dataset.v;
+  if(b.dataset.a === 't'){ const x = VOLS.find(x=>x.v===v); x.ok = !x.ok; }
+  else { VOLS = VOLS.filter(x=>x.v!==v); }
+  admin(); drawVols(); render();
+});
+
+$('addv').addEventListener('click', ()=>{
+  const v = parseInt($('fv').value, 10);
+  if(!v || v < 1){ toast('Введите объём в мл'); return; }
+  if(VOLS.some(x=>x.v===v)){ toast(v + ' мл уже есть'); return; }
+  VOLS.push({v, ok:true}); $('fv').value='';
+  admin(); drawVols(); render(); toast(v + ' мл добавлен');
+});
+
 $('add').addEventListener('click', ()=>{
   const brand = $('fb').value.trim(), name = $('fn').value.trim();
   if(!brand || !name){ toast('Заполните бренд и название'); return; }
@@ -741,7 +817,7 @@ $('fw').addEventListener('input', e=>{ PHONE = e.target.value.replace(/\D/g,'');
 $('fc').addEventListener('input', e=>{ const v = e.target.value.trim(); if(v.length >= 4) PIN_CODE = v; });
 $('fp').addEventListener('input', e=>{
   const v = parseFloat(e.target.value);
-  if(v > 0){ BASE = v; $('perml').textContent = 'Цена за 1 мл: ' + perMl().toFixed(2).replace('.',',') +
+  if(v > 0){ BASE = v; admin(); $('perml').textContent = 'Цена за 1 мл: ' + perMl().toFixed(2).replace('.',',') +
     ' ₸ · набор 3 × 30 мл = ' + money(MAX*30*perMl()); }
 });
 
@@ -755,6 +831,7 @@ function buildFile(){
             .split(P('BASE')).join(String(BASE))
             .split(P('PIN')).join(PIN_CODE)
             .split(P('PHONE')).join(PHONE)
+            .split(P('VOLS')).join(JSON.stringify(VOLS))
             .split(P('TEMPLATE')).join(emb);
 }
 $('save').addEventListener('click', ()=>{
@@ -774,6 +851,7 @@ $('dump').addEventListener('click', ()=>{
   copy('Цена набора 3×6 мл: ' + BASE + ' ₸\n\n' + t, 'Список скопирован');
 });
 
+drawVols();
 render();
 <\/script>
 <script type="text/plain" id="src">@@TEMPLATE@@<\/script>
